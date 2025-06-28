@@ -1,8 +1,6 @@
-setuptools>=65.0.0
+numpy==1.26.4
+pandas==2.3.0
+pandas-ta==0.3.14b0
 python-telegram-bot==20.6
-python-dotenv
-pandas
-numpy
-pandas-ta
-httpx
+python-dotenv==1.1.1
 requests
