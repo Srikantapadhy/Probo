@@ -1,4 +1,5 @@
 import logging
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Updater,
@@ -9,7 +10,6 @@ from telegram.ext import (
     CallbackContext
 )
 from dotenv import load_dotenv
-import os
 
 # Load environment variables
 load_dotenv()
@@ -38,40 +38,46 @@ def button_handler(update: Update, context: CallbackContext):
     query.answer()
 
     if query.data == "btc_5":
-        query.edit_message_text(text="⚡ Predicting BTC price for next 5 minutes...")
+        query.message.reply_text("⚡ Predicting BTC price for next 5 minutes...")
     elif query.data == "btc_10":
-        query.edit_message_text(text="⚡ Predicting BTC price for next 10 minutes...")
+        query.message.reply_text("⚡ Predicting BTC price for next 10 minutes...")
     elif query.data == "btc_15":
-        query.edit_message_text(text="⚡ Predicting BTC price for next 15 minutes...")
+        query.message.reply_text("⚡ Predicting BTC price for next 15 minutes...")
     elif query.data == "probo":
-        query.edit_message_text(text="🧠 Send your Probo-style question (e.g. Will BTC cross 68k tonight?)")
+        query.message.reply_text("🧠 Send your Probo-style question (e.g. Will BTC cross 68k tonight?)")
 
-# 🔁 PROBO-STYLE TEXT HANDLER
+# 🧠 PROBO QUESTION HANDLER
 def handle_probo_question(update: Update, context: CallbackContext):
     question = update.message.text
-    reply = f"🤖 Prediction for: *{question}*\n\n📉 Direction: DOWN\n📊 Confidence: 74%\n📈 RSI: 62"
+    reply = (
+        f"🤖 Prediction for: *{question}*\n\n"
+        f"📉 Direction: DOWN\n"
+        f"📊 Confidence: 74%\n"
+        f"📈 RSI: 62"
+    )
     update.message.reply_text(reply, parse_mode="Markdown")
 
-# 🔁 MAIN ENTRY
+# ❓ UNKNOWN COMMAND HANDLER
+def unknown_command(update: Update, context: CallbackContext):
+    update.message.reply_text("❓ Unknown command. Please use /start to see options.")
+
+# ⚠️ ERROR HANDLER
+def error(update: Update, context: CallbackContext):
+    logger.warning(f"⚠️ Update {update} caused error: {context.error}")
+
+# 🚀 MAIN FUNCTION
 def main():
     updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", start))
-
+    dp.add_handler(CommandHandler("help", start))  # reuse start for help
     dp.add_handler(CallbackQueryHandler(button_handler))
-
-    # You can keep CommandHandler for btc or use CallbackQueryHandler (preferred)
-    dp.add_handler(CommandHandler("btc", start))
-    dp.add_handler(CommandHandler("btc_5", start))
-    dp.add_handler(CommandHandler("btc_10", start))
-    dp.add_handler(CommandHandler("btc_15", start))
-    dp.add_handler(CommandHandler("probo", start))
-
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_probo_question))
+    dp.add_handler(MessageHandler(Filters.command, unknown_command))
+    dp.add_error_handler(error)
 
-    print("Bot is running (v13.7)...")
+    logger.info("✅ Bot is running (v13.7)...")
     updater.start_polling()
     updater.idle()
 
