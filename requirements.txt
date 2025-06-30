@@ -1,0 +1,5 @@
+--prefer-binary
+Flask==2.3.3
+python-telegram-bot==20.7
+pandas==2.1.4
+cython==0.29.36
