@@ -1,7 +1,5 @@
-setuptools==68.2.2
-numpy==1.26.4
-pandas==2.3.0
-pandas-ta==0.3.14b0
-python-telegram-bot==13.7   # ⬅️ Version downgraded
-python-dotenv==1.1.1
-requests==2.32.4
+python-telegram-bot==13.15
+python-dotenv==1.0.1
+requests==2.31.0
+pandas==2.2.2
+ta==0.11.0
